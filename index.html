@@ -14,6 +14,14 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th { background: #21262d; padding: 12px; text-align: left; border-bottom: 2px solid #30363d; font-size: 13px; }
         td { padding: 10px; border-bottom: 1px solid #30363d; font-size: 13px; }
+        
+        /* Perbaikan: Agar teks mudah di-copy dan tidak menyeleksi elemen lain */
+        .url-text { user-select: text; cursor: text; display: block; }
+        
+        /* Indikator klik pada Tier */
+        .sortable { cursor: pointer; text-decoration: underline; color: #58a6ff; }
+        .sortable:hover { color: #79c0ff; }
+        
         .status-ok { color: #3fb950; font-weight: bold; }
         .status-err { color: #f85149; font-weight: bold; }
         .badge { padding: 2px 8px; border-radius: 4px; background: #21262d; border: 1px solid #30363d; font-size: 11px; }
@@ -22,49 +30,53 @@
 <body>
     <div class="container">
         <h1>🌐 URL Checker Pro</h1>
-        <textarea id="urls" placeholder="Masukkan URL (satu per baris)..."></textarea>
+        <textarea id="urls" placeholder="Masukkan URL..."></textarea>
         <button onclick="check()">CHECK URL</button>
         <div id="results"></div>
     </div>
 
     <script>
+        let currentData = [];
+
         async function check() {
             const urls = document.getElementById('urls').value.split('\n').filter(u => u.trim());
             const resDiv = document.getElementById('results');
             resDiv.innerHTML = "Memproses...";
-            
             try {
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     body: JSON.stringify({ urls }),
                     headers: { 'Content-Type': 'application/json' }
                 });
-                const data = await response.json();
-                
-                let html = `<table><tr>
-                    <th>URL</th>
-                    <th>Status</th>
-                    <th>Provider</th>
-                    <th>Tier</th>
-                    <th>Latency</th>
-                    <th>Country</th>
+                currentData = await response.json();
+                renderTable(currentData);
+            } catch (err) { resDiv.innerHTML = "Gagal terhubung."; }
+        }
+
+        function renderTable(data) {
+            let html = `<table><tr>
+                <th>URL</th><th>Status</th><th>Provider</th>
+                <th class="sortable" onclick="sortData()">Tier ↕</th>
+                <th>Latency</th><th>Country</th></tr>`;
+            
+            data.forEach(item => {
+                html += `<tr>
+                    <td><span class="url-text">${item.url}</span></td>
+                    <td class="${item.status.includes('Online') ? 'status-ok' : 'status-err'}">${item.status}</td>
+                    <td><span class="badge">${item.provider}</span></td>
+                    <td>${item.tier || '-'}</td>
+                    <td>${item.latency}</td>
+                    <td>${item.country}</td>
                 </tr>`;
-                
-                data.forEach(item => {
-                    html += `<tr>
-                        <td>${item.url}</td>
-                        <td class="${item.status.includes('Online') ? 'status-ok' : 'status-err'}">${item.status}</td>
-                        <td><span class="badge">${item.provider}</span></td>
-                        <td>${item.tier || '-'}</td>
-                        <td>${item.latency}</td>
-                        <td>${item.country}</td>
-                    </tr>`;
-                });
-                html += `</table>`;
-                resDiv.innerHTML = html;
-            } catch (err) {
-                resDiv.innerHTML = "<p style='color:red'>Gagal terhubung ke server.</p>";
-            }
+            });
+            html += `</table>`;
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function sortData() {
+            // Logika Sorting berdasarkan Tier
+            currentData.sort((a, b) => (a.tier || "").localeCompare(b.tier || ""));
+            renderTable(currentData);
         }
     </script>
 </body>
