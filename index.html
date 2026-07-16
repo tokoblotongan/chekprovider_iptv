@@ -16,25 +16,33 @@
         th { background: #21262d; padding: 12px; text-align: left; border-bottom: 2px solid #30363d; font-size: 13px; }
         td { padding: 10px; border-bottom: 1px solid #30363d; font-size: 13px; }
         
-        /* Solusi blok URL presisi */
-        .url-box { display: inline-block; cursor: text; user-select: text; }
+        /* Fitur Klik Copy */
+        .url-box { 
+            cursor: pointer; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            transition: background 0.2s;
+            display: inline-block;
+        }
+        .url-box:hover { background: #30363d; color: #58a6ff; }
         
-        /* Fitur sort */
         .sortable { cursor: pointer; text-decoration: underline; color: #58a6ff; }
-        .sortable:hover { color: #79c0ff; }
-        
         .status-ok { color: #3fb950; font-weight: bold; }
         .status-err { color: #f85149; font-weight: bold; }
         .badge { padding: 2px 8px; border-radius: 4px; background: #21262d; border: 1px solid #30363d; font-size: 11px; }
+        
+        /* Toast Notification */
+        #toast { position: fixed; bottom: 20px; right: 20px; background: #238636; color: white; padding: 10px 20px; border-radius: 6px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌐 URL Checker Pro</h1>
-        <textarea id="urls" placeholder="Masukkan URL (satu per baris)..."></textarea>
+        <textarea id="urls" placeholder="Masukkan URL..."></textarea>
         <button onclick="check()">CHECK URL</button>
         <div id="results"></div>
     </div>
+    <div id="toast">URL disalin!</div>
 
     <script>
         let currentData = [];
@@ -51,18 +59,21 @@
                 });
                 currentData = await response.json();
                 renderTable(currentData);
-            } catch (err) { resDiv.innerHTML = "Gagal terhubung ke server."; }
+            } catch (err) { resDiv.innerHTML = "Gagal terhubung."; }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
         }
 
         function renderTable(data) {
-            let html = `<table><tr>
-                <th>URL</th><th>Status</th><th>Provider</th>
-                <th class="sortable" onclick="sortData()">Tier ↕</th>
-                <th>Latency</th><th>Country</th></tr>`;
-            
+            let html = `<table><tr><th>URL</th><th>Status</th><th>Provider</th><th class="sortable" onclick="sortData()">Tier ↕</th><th>Latency</th><th>Country</th></tr>`;
             data.forEach(item => {
                 html += `<tr>
-                    <td><div class="url-box">${item.url}</div></td>
+                    <td><div class="url-box" onclick="copyToClipboard('${item.url}')" title="Klik untuk Copy">${item.url}</div></td>
                     <td class="${item.status.includes('Online') ? 'status-ok' : 'status-err'}">${item.status}</td>
                     <td><span class="badge">${item.provider || '-'}</span></td>
                     <td>${item.tier || '-'}</td>
