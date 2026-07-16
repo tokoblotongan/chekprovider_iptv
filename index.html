@@ -12,8 +12,7 @@
         .btn-main { background: #238636; color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-main:hover { background: #2ea043; }
         
-        /* Tombol Copy All */
-        .btn-copy-all { background: #1f883d; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 10px; display: inline-block; }
+        .btn-copy-all { background: #1f883d; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 10px; }
         .btn-copy-all:hover { background: #2ea043; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -37,11 +36,11 @@
         <button class="btn-main" onclick="check()">CHECK URL</button>
         
         <div id="result-controls" style="margin-top: 20px; display: none;">
-            <button class="btn-copy-all" onclick="copyAllUrls()">📋 Copy All URLs</button>
+            <button class="btn-copy-all" onclick="copyAllUrls()">📋 Copy All URLs (Vertikal)</button>
             <div id="results"></div>
         </div>
     </div>
-    <div id="toast">Disalin ke clipboard!</div>
+    <div id="toast">Disalin!</div>
 
     <script>
         let currentData = [];
@@ -68,9 +67,10 @@
         }
 
         function copyAllUrls() {
+            // join('\n') memastikan hasil copy tersusun vertikal
             const allUrls = currentData.map(item => item.url).join('\n');
             navigator.clipboard.writeText(allUrls);
-            showToast("Semua URL disalin!");
+            showToast("Semua URL disalin secara vertikal!");
         }
 
         function showToast(msg) {
