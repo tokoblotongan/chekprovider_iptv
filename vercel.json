@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "functions": {
+    "main.py": {
+      "runtime": "vercel-python@0.0.1"
+    }
+  },
+  "routes": [
+    { 
+      "src": "/api/check", 
+      "dest": "main.py" 
+    },
+    { 
+      "src": "/(.*)", 
+      "dest": "/index.html" 
+    }
+  ]
+}
