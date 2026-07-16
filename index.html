@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Checker Pro</title>
     <style>
         body { background: #0d1117; color: #e6edf3; font-family: -apple-system, sans-serif; padding: 20px; }
@@ -15,10 +16,10 @@
         th { background: #21262d; padding: 12px; text-align: left; border-bottom: 2px solid #30363d; font-size: 13px; }
         td { padding: 10px; border-bottom: 1px solid #30363d; font-size: 13px; }
         
-        /* Perbaikan: Agar teks mudah di-copy dan tidak menyeleksi elemen lain */
-        .url-text { user-select: text; cursor: text; display: block; }
+        /* Solusi blok URL presisi */
+        .url-box { display: inline-block; cursor: text; user-select: text; }
         
-        /* Indikator klik pada Tier */
+        /* Fitur sort */
         .sortable { cursor: pointer; text-decoration: underline; color: #58a6ff; }
         .sortable:hover { color: #79c0ff; }
         
@@ -30,7 +31,7 @@
 <body>
     <div class="container">
         <h1>🌐 URL Checker Pro</h1>
-        <textarea id="urls" placeholder="Masukkan URL..."></textarea>
+        <textarea id="urls" placeholder="Masukkan URL (satu per baris)..."></textarea>
         <button onclick="check()">CHECK URL</button>
         <div id="results"></div>
     </div>
@@ -50,7 +51,7 @@
                 });
                 currentData = await response.json();
                 renderTable(currentData);
-            } catch (err) { resDiv.innerHTML = "Gagal terhubung."; }
+            } catch (err) { resDiv.innerHTML = "Gagal terhubung ke server."; }
         }
 
         function renderTable(data) {
@@ -61,12 +62,12 @@
             
             data.forEach(item => {
                 html += `<tr>
-                    <td><span class="url-text">${item.url}</span></td>
+                    <td><div class="url-box">${item.url}</div></td>
                     <td class="${item.status.includes('Online') ? 'status-ok' : 'status-err'}">${item.status}</td>
-                    <td><span class="badge">${item.provider}</span></td>
+                    <td><span class="badge">${item.provider || '-'}</span></td>
                     <td>${item.tier || '-'}</td>
-                    <td>${item.latency}</td>
-                    <td>${item.country}</td>
+                    <td>${item.latency || '-'}</td>
+                    <td>${item.country || '-'}</td>
                 </tr>`;
             });
             html += `</table>`;
@@ -74,7 +75,6 @@
         }
 
         function sortData() {
-            // Logika Sorting berdasarkan Tier
             currentData.sort((a, b) => (a.tier || "").localeCompare(b.tier || ""));
             renderTable(currentData);
         }
