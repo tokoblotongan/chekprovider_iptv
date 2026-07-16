@@ -1,18 +1,11 @@
 {
   "version": 2,
-  "functions": {
-    "main.py": {
-      "runtime": "vercel-python@0.0.1"
-    }
-  },
+  "builds": [
+    { "src": "main.py", "use": "@vercel/python" },
+    { "src": "index.html", "use": "@vercel/static" }
+  ],
   "routes": [
-    { 
-      "src": "/api/check", 
-      "dest": "main.py" 
-    },
-    { 
-      "src": "/(.*)", 
-      "dest": "/index.html" 
-    }
+    { "src": "/api/check", "dest": "main.py" },
+    { "src": "/(.*)", "dest": "index.html" }
   ]
 }
